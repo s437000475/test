@@ -1,0 +1,267 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<script>
+var switchc = true;
+		function switchccc(){
+			switchc = !switchc;
+
+		}
+function start123() {
+			var dps = []; // dataPoints
+			var dps2 = []; // dataPoints
+			var dps3 = []; // dataPoints
+			var dps4 = []; // dataPoints
+			var chart = new CanvasJS.Chart("chartContainer", {
+				animationEnabled: true,
+				title: {
+					text: "Testing"
+				},
+				axisY: {
+					title: "Temperature (in °C)",
+					suffix: " °C"
+				},
+				legend: {
+					cursor: "pointer",
+					fontSize: 16,
+				},
+				toolTip: {
+					shared: true
+				},
+				data: [{
+					name: "High limt",
+					yValueFormatString: "#0.## °C",
+					showInLegend: true,
+					type: "line",
+					dataPoints: dps
+				},
+				{
+					name: "Low limt",
+					yValueFormatString: "#0.## °C",
+					showInLegend: true,
+					type: "line",
+					dataPoints: dps2
+				},
+				{
+					name: "Set temp",
+					yValueFormatString: "#0.## °C",
+					showInLegend: true,
+					type: "line",
+					dataPoints: dps3
+				},
+				{
+					name: "current temp",
+					yValueFormatString: "#0.## °C",
+					showInLegend: true,
+					type: "line",
+					dataPoints: dps4
+				}]
+			});
+			chart.render();
+			var xVal = 0;
+			var yVal = 50;
+			var yVal1 = 50;
+			var yVal2 = 50;
+			var yVal3 = 50;
+
+			var updateInterval = 500;
+			var dataLength = 20; // number of dataPoints visible at any point
+			var inTemp = parseFloat(document.getElementById("fname").value);
+			var setTempFromUSER = parseFloat(document.getElementById("lname").value);
+			var on;
+			on = false;
+			var holdh;
+			holdh = false;
+			var holdc;
+			holdc = false;
+
+			var updateChart = function (count) {
+
+				if ((inTemp < setTempFromUSER || holdh) && holdc) {
+					holdc = true;
+					holdh = true;
+					if (on) {
+						inTemp = inTemp + 0.2;
+						document.getElementById("dot").style.background = "red";
+					}
+					if (inTemp > setTempFromUSER + 1) {
+						on = false;
+						document.getElementById("dot").style.background = "green";
+					}
+					if (inTemp < setTempFromUSER - 1) {
+						holdh = false;
+						on = true;
+					}
+				} else {
+					holdh = false;
+					holdc = false;
+					if (on) {
+						inTemp = inTemp - 0.2;
+						document.getElementById("dot").style.background="blue"
+					}
+					if (inTemp < setTempFromUSER - 1) {
+						on = false;
+						document.getElementById("dot").style.background = "green";
+					}
+					if (inTemp > setTempFromUSER + 1) {
+						holdc = true;
+						on = true;
+					}
+				}
+				if (inTemp > setTempFromUSER + 1) {
+					holdc = false;
+				}
+				if (inTemp < setTempFromUSER - 1) {
+					holdc = true;
+					holdh = true;
+				}
+
+				count = count || 1;
+
+				for (var j = 0; j < count; j++) {
+					dps.push({
+						x: xVal,
+						y: setTempFromUSER + 1
+					});
+					dps2.push({
+						x: xVal,
+						y: setTempFromUSER - 1
+					});
+					dps3.push({
+						x: xVal,
+						y: setTempFromUSER
+					});
+					dps4.push({
+						x: xVal,
+						y: inTemp
+					});
+					if(switchc)
+					inTemp = inTemp - 0.1;
+					else
+					inTemp = inTemp + 0.1;
+					xVal++;
+
+				}
+
+				if (dps.length > dataLength) {
+					dps.shift();
+				}
+				if (dps2.length > dataLength) {
+					dps2.shift();
+				}
+				if (dps3.length > dataLength) {
+					dps3.shift();
+				}
+				if (dps4.length > dataLength) {
+					dps4.shift();
+				}
+
+				chart.render();
+			};
+
+			updateChart(dataLength);
+
+			setInterval(function () { updateChart() }, updateInterval);
+
+		}
+	</script>
+</head>
+<style>
+	.switch {
+	  position: relative;
+	  display: inline-block;
+	  width: 60px;
+	  height: 34px;
+	}
+	
+	.switch input { 
+	  opacity: 0;
+	  width: 0;
+	  height: 0;
+	}
+	
+	.slider {
+	  position: absolute;
+	  cursor: pointer;
+	  top: 0;
+	  left: 0;
+	  right: 0;
+	  bottom: 0;
+	  background-color: blue;
+	  -webkit-transition: .4s;
+	  transition: .4s;
+	}
+	
+	.slider:before {
+	  position: absolute;
+	  content: "";
+	  height: 26px;
+	  width: 26px;
+	  left: 4px;
+	  bottom: 4px;
+	  background-color: white;
+	  -webkit-transition: .4s;
+	  transition: .4s;
+	}
+	
+	input:checked + .slider {
+	  background-color: red;
+	}
+	
+	input:focus + .slider {
+	  box-shadow: 0 0 1px red;
+	}
+	
+	input:checked + .slider:before {
+	  -webkit-transform: translateX(26px);
+	  -ms-transform: translateX(26px);
+	  transform: translateX(26px);
+	}
+	
+	/* Rounded sliders */
+	.slider.round {
+	  border-radius: 34px;
+	}
+	
+	.slider.round:before {
+	  border-radius: 50%;
+	}
+
+	.dot {
+  height: 25px;
+  width: 25px;
+  background-color: red;
+  border-radius: 50%;
+  display: inline-block;
+}
+	</style>
+<body>
+	<div id="chartContainer" style="height: 370px; width: 100%;"></div>
+	<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
+	<div style="border-color: black; border-style:solid ;"><span class="dot" id="dot"></span> <span>  &nbsp; &nbsp;[Red = Heating in on | blue = Cooling in on | Green is both off] </span></div>
+	<br>
+	
+	<form action="/action_page.php" style="border-color: black; border-style:solid ;">
+		<br>
+		<label for="fname">Temp set by User:</label>
+		<input type="text" id="fname" name="fname"><br><br>
+		<label for="lname">enclosure Temp:</label>
+		<input type="text" id="lname" name="lname"><br><br>
+		<input type="button" id="start" onclick="start123();" value="start"><br><br>
+	  </form>
+	  <br>
+	  <div style="border-color: black; border-style:solid ;">
+		<br>
+	  <span>Fighting Cool &nbsp;</span>
+		<label class="switch">
+			<input type="checkbox" id="chickbox" onclick=" switchccc();">
+			<span class="slider round"></span>
+		  </label>
+		  <span>&nbsp;Fighting Heat </span>
+		  <br>
+		</div>
+</body>
+
+</html>
